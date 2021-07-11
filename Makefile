@@ -7,6 +7,7 @@ build:
 	-L"C:\sdks\SDL2_mingw_32bit\lib" \
 	-lmingw32 \
 	-lSDL2main \
+	-lm \
 	-lSDL2 \
 	-o renderer.exe
 

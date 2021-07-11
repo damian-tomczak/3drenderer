@@ -12,7 +12,9 @@
 vec3_t cube_points[N_POINTS]; // 9x9x9 cube
 vec2_t projected_points[N_POINTS];
 
-float fov_factor = 128;
+vec3_t camera_position = { .x = 0, .y = 0, .z = -5 };
+vec3_t cube_rotation = { .x = 0, .y = 0, .z = 0} ;
+float fov_factor = 640;
 
 bool is_running = false;
 
@@ -70,20 +72,31 @@ void process_input(void)
 vec2_t project(vec3_t point)
 {
     vec2_t projected_point = {
-        .x = (fov_factor * point.x),
-        .y = (fov_factor * point.y)
+        .x = (fov_factor * point.x) / point.z, // Perspective divide formula
+        .y = (fov_factor * point.y) / point.z  // Perspective divide formula
     };
     return projected_point;
 }
 
 void update(void) 
 {
+    cube_rotation.x += 0.01;
+    cube_rotation.y += 0.01;
+    cube_rotation.z += 0.01;
+
     for(int i = 0; i < N_POINTS; i++)
     {
         vec3_t point = cube_points[i];
 
+        vec3_t trasnformed_point = vec3_rotate_x(point, cube_rotation.x);
+        trasnformed_point = vec3_rotate_y(trasnformed_point, cube_rotation.y);
+        trasnformed_point = vec3_rotate_z(trasnformed_point, cube_rotation.z);
+
+        // Translate the points away from the camera
+        trasnformed_point.z -= camera_position.z;
+
         // Project the current point
-        vec2_t projected_point = project(point);
+        vec2_t projected_point = project(trasnformed_point);
 
         // Save the projected 2D vector in the array of projected points
         projected_points[i] = projected_point;
@@ -119,7 +132,7 @@ int main(int argc, char* argv[])
 
     setup();
 
-vec3_t myvector = { 2.0, 3.0, -4.0 };
+    vec3_t myvector = { 2.0, 3.0, -4.0 };
 
     while (is_running) 
     {
